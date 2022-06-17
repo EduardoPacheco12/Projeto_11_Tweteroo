@@ -10,23 +10,37 @@ const tweets = [];
 
 server.post("/sign-up", (request, response) => {
     users.push(request.body);
-    console.log(users);
     response.send("OK");
 });
 
 server.post("/tweets", (request, response) => {
-    const tweetUser = {
-        username: `${request.headers.user}`,
-        tweet: `${request.body.tweet}`
-    }
-    tweets.push(tweetUser);
-    console.log(tweets);
+    tweets.push(request.body);
     response.send("OK");
 });
 
 server.get("/tweets", (request, response) => {
-    const tweetsExemplo = [];
-    response.send(tweetsExemplo);
+    let returnedTweets = [];
+    if(tweets.length < 11) {
+        tweets.map((index) => {
+            let user = users.find(e => e.username === index.username)
+            returnedTweets.push({
+                username: `${user.username}`,
+                avatar: `${user.avatar}`,
+                tweet: `${index.tweet}`
+            })
+        })
+    } else {
+        for(let i = tweets.length - 10; i < tweets.length; i++) {
+            let user = users.find(e => e.username === tweets[i].username)
+            returnedTweets.push({
+                username: `${user.username}`,
+                avatar: `${user.avatar}`,
+                tweet: `${tweets[i].tweet}`
+            })
+        }
+    }
+    returnedTweets = returnedTweets.reverse();
+    response.send(returnedTweets);
 });
 
 server.listen(5000);
